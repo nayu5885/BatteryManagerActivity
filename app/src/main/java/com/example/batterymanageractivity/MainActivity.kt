@@ -7,6 +7,7 @@ import android.content.IntentFilter
 import android.os.BatteryManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Button
 import android.widget.TextView
 
 class MainActivity : AppCompatActivity() {
@@ -16,16 +17,24 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val textView:TextView = findViewById(R.id.textView)
+        val button:Button = findViewById(R.id.button)
 
-        val batteryStatus = IntentFilter(Intent.ACTION_BATTERY_CHANGED).let {
-            this.registerReceiver(null, it)
+        button.setOnClickListener {
+
+            val batteryStatus = IntentFilter(Intent.ACTION_BATTERY_CHANGED).let {
+                this.registerReceiver(null, it)
+            }
+
+            val batteryPct: Float? = batteryStatus?.let { intent ->
+                val level: Int = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
+                val scale: Int = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
+                level * 100 / scale.toFloat()
+            }
+
+            textView.text = batteryPct.toString()
+
         }
-        val batteryPct: Float? = batteryStatus?.let { intent ->
-            val level: Int = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
-            val scale: Int = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
-            level * 100 / scale.toFloat()
-        }
-        textView.text = batteryPct.toString()
+
 
     }
 
